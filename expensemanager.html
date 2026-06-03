@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniPocket // Student Budget Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #4f46e5;
+            --earning-color: #10b981;
+            --spending-color: #f43f5e;
+            --savings-color: #0ea5e9;
+            --border-radius: 16px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px dashed #e2e8f0;
+            padding-bottom: 1.5rem;
+        }
+
+        .logo-area h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+        }
+
+        .logo-area h1 span { color: var(--primary); }
+        .logo-area p { color: var(--text-muted); font-style: italic; margin-top: 0.2rem;}
+
+        .btn-reset-all {
+            background-color: #cbd5e1;
+            color: #334155;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s;
+        }
+
+        .btn-reset-all:hover {
+            background-color: #94a3b8;
+            color: #0f172a;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid #f1f5f9;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .earn-card::before { background-color: var(--earning-color); }
+        .spend-card::before { background-color: var(--spending-color); }
+        .save-card::before { background-color: var(--savings-color); }
+
+        .card h3 {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.6rem;
+            letter-spacing: 0.5px;
+        }
+
+        .card .amount {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .earn-card .amount { color: var(--earning-color); }
+        .spend-card .amount { color: var(--spending-color); }
+        .save-card .amount { color: var(--savings-color); }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 2.5rem;
+        }
+
+        @media (max-width: 850px) {
+            .main-content { grid-template-columns: 1fr; }
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1.2rem;
+            font-weight: 700;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .log-section {
+            background: var(--card-bg);
+            padding: 1.8rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid #f1f5f9;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1.2rem;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+
+        input, select {
+            padding: 0.75rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            outline: none;
+            font-size: 0.95rem;
+            background-color: #ffffff;
+        }
+
+        input:focus, select:focus { border-color: var(--primary); }
+
+        .btn-log {
+            width: 100%;
+            color: white;
+            border: none;
+            padding: 0.85rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-log:hover { opacity: 0.9; }
+        .btn-earn { background-color: var(--earning-color); }
+        .btn-spend { background-color: var(--spending-color); }
+
+        .ledger-box {
+            background: var(--card-bg);
+            padding: 1.8rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid #f1f5f9;
+        }
+
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .flow-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            background: #f8fafc;
+            border-left: 4px solid transparent;
+        }
+
+        .flow-item.income { border-left-color: var(--earning-color); }
+        .flow-item.expense { border-left-color: var(--spending-color); }
+
+        .flow-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .flow-value { font-weight: 700; }
+        .income .flow-value { color: var(--earning-color); }
+        .expense .flow-value { color: var(--spending-color); }
+
+        .timestamp {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 0.15rem;
+            display: block;
+        }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: #cbd5e1;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 0.2rem;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover {
+            color: var(--spending-color);
+            background-color: #ffe4e6;
+        }
+
+        .insight-box {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            color: #b45309;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo-area">
+                <h1>UniPocket<span>.</span></h1>
+                <p>"Where did all the money go? Food and rent and rides in tow."</p>
+            </div>
+            <button class="btn-reset-all" onclick="resetAllData()">🔄 Reset Sheet</button>
+        </header>
+
+        <section class="dashboard-grid">
+            <div class="card earn-card">
+                <h3>Total Budget / Income</h3>
+                <div class="amount" id="display-earned">$500.00</div>
+            </div>
+            <div class="card spend-card">
+                <h3>Grand Total Spent</h3>
+                <div class="amount" id="display-spent">$185.00</div>
+            </div>
+            <div class="card save-card">
+                <h3>Grand Total Balance</h3>
+                <div class="amount" id="display-saved">$315.00</div>
+            </div>
+        </section>
+
+        <main class="main-content">
+            <div class="form-container">
+                
+                <section class="log-section">
+                    <h2>💰 Log Budget Input</h2>
+                    <form id="earn-form" onsubmit="event.preventDefault(); handleEarn();">
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>Source of Funds</label>
+                                <input type="text" id="earn-source" placeholder="e.g., Monthly Allowance" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Amount ($)</label>
+                                <input type="number" id="earn-amount" placeholder="0.00" step="0.01" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-log btn-earn">Track Budget Inflow</button>
+                    </form>
+                </section>
+
+                <section class="log-section">
+                    <h2>💸 Log Student Expenses</h2>
+                    <form id="spend-form" onsubmit="event.preventDefault(); handleSpend();">
+                        <div class="input-group">
+                            <label>What did you spend on?</label>
+                            <input type="text" id="spend-item" placeholder="e.g., Cafeteria Lunch" required>
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>Amount ($)</label>
+                                <input type="number" id="spend-amount" placeholder="0.00" step="0.01" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Category</label>
+                                <select id="spend-category">
+                                    <option value="Food & Groceries">Food</option>
+                                    <option value="Rent & Accommodation">Rent</option>
+                                    <option value="Rides & Transport">Rides (Fare)</option>
+                                    <option value="Other Student Essentials">Other Essentials</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-log btn-spend">Track Dime Outflow</button>
+                    </form>
+                </section>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <section class="ledger-box">
+                    <h2>📋 Clean Student Balance Sheet</h2>
+                    <div class="transaction-list" id="ledger-list">
+                        </div>
+                </section>
+
+                <section class="ledger-box">
+                    <h2>💡 Where to Cut & Spare</h2>
+                    <div class="insight-box" id="insight-display">
+                        </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Start the array with your sample data pre-loaded so it initializes with presentation values
+        let transactions = [
+            { id: 1, type: 'income', title: 'Monthly Allowance', amount: 500.00, timeStr: 'May 26 at 10:00 AM' },
+            { id: 2, type: 'expense', title: 'Hostel Rent Payment', amount: 120.00, category: 'Rent & Accommodation', timeStr: 'May 26 at 11:15 AM' },
+            { id: 3, type: 'expense', title: 'Cafeteria Lunch & Snacks', amount: 45.00, category: 'Food & Groceries', timeStr: 'May 26 at 1:30 PM' },
+            { id: 4, type: 'expense', title: 'Campus Transit Ticket', amount: 20.00, category: 'Rides & Transport', timeStr: 'May 26 at 4:45 PM' }
+        ];
+
+        // Format system time to human-readable strings
+        function getFormattedTime() {
+            const now = new Date();
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const month = months[now.getMonth()];
+            const day = now.getDate();
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // convert 0 to 12
+            return `${month} ${day} at ${hours}:${minutes} ${ampm}`;
+        }
+
+        function updateMetrics() {
+            let totalEarned = 0;
+            let totalSpent = 0;
+            let categoryTotals = { "Food & Groceries": 0, "Rent & Accommodation": 0, "Rides & Transport": 0, "Other Student Essentials": 0 };
+
+            transactions.forEach(t => {
+                if (t.type === 'income') {
+                    totalEarned += t.amount;
+                } else {
+                    totalSpent += t.amount;
+                    categoryTotals[t.category] += t.amount;
+                }
+            });
+
+            let netSaved = totalEarned - totalSpent;
+
+            document.getElementById('display-earned').innerText = `$${totalEarned.toFixed(2)}`;
+            document.getElementById('display-spent').innerText = `$${totalSpent.toFixed(2)}`;
+            document.getElementById('display-saved').innerText = `${netSaved >= 0 ? '' : '-'}$${Math.abs(netSaved).toFixed(2)}`;
+            
+            generateInsights(netSaved, totalEarned, totalSpent, categoryTotals);
+        }
+
+        function generateInsights(balance, totalEarned, totalSpent, categoryTotals) {
+            let insightElement = document.getElementById('insight-display');
+            
+            if (totalSpent === 0) {
+                insightElement.innerHTML = "Your balance sheet looks pristine. Add your structural daily costs above!";
+                insightElement.style.color = "#b45309";
+                insightElement.style.backgroundColor = "#fffbeb";
+                insightElement.style.borderColor = "#fef3c7";
+                return;
+            }
+
+            let highestCat = Object.keys(categoryTotals).reduce((a, b) => categoryTotals[a] > categoryTotals[b] ? a : b);
+            
+            if (balance < 0) {
+                insightElement.innerHTML = `⚠️ <strong>Financial Warning:</strong> You are currently over budget! Look to immediately reduce costs in your highest spending area: <strong>${highestCat}</strong>.`;
+                insightElement.style.color = "#b91c1c";
+                insightElement.style.backgroundColor = "#fee2e2";
+                insightElement.style.borderColor = "#fca5a5";
+            } else if (categoryTotals["Food & Groceries"] > (totalEarned * 0.4) && totalEarned > 0) {
+                insightElement.innerHTML = `🍔 <strong>Spare Advice:</strong> Your <strong>Food</strong> spending is taking up a massive chunk of your wallet. Try skipping cafe treats to protect your student budget!`;
+                insightElement.style.color = "#d97706";
+                insightElement.style.backgroundColor = "#fffbeb";
+                insightElement.style.borderColor = "#fef3c7";
+            } else if (categoryTotals["Rides & Transport"] > (totalEarned * 0.2) && totalEarned > 0) {
+                insightElement.innerHTML = `🚗 <strong>Cut Advice:</strong> Your <strong>Rides (Fare)</strong> totals are mounting quickly. Try taking the campus shuttle or public transit to save cash.`;
+                insightElement.style.color = "#d97706";
+                insightElement.style.backgroundColor = "#fffbeb";
+                insightElement.style.borderColor = "#fef3c7";
+            } else {
+                insightElement.innerHTML = `✨ <strong>Wallet Guide:</strong> Doing fantastic! Your budget allocations look highly stable and well managed across food, rent, and rides ($${balance.toFixed(2)} remaining).`;
+                insightElement.style.color = "#047857";
+                insightElement.style.backgroundColor = "#ecfdf5";
+                insightElement.style.borderColor = "#a7f3d0";
+            }
+        }
+
+        function renderLedger() {
+            const ledgerList = document.getElementById('ledger-list');
+            ledgerList.innerHTML = '';
+
+            transactions.forEach((t, index) => {
+                const sign = t.type === 'income' ? '+' : '-';
+                const labelSub = t.type === 'income' ? 'Inflow Budget' : t.category;
+                
+                ledgerList.innerHTML += `
+                    <div class="flow-item ${t.type}">
+                        <div>
+                            <h4>${t.title}</h4>
+                            <span style="font-size:0.75rem; color:var(--text-muted);">${labelSub}</span>
+                            <span class="timestamp">🕒 ${t.timeStr}</span>
+                        </div>
+                        <div class="flow-meta">
+                            <span class="flow-value">${sign}$${t.amount.toFixed(2)}</span>
+                            <button class="btn-delete" onclick="deleteTransaction(${index})" title="Delete entry">❌</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function handleEarn() {
+            const source = document.getElementById('earn-source').value;
+            const amount = parseFloat(document.getElementById('earn-amount').value);
+
+            transactions.push({ 
+                id: Date.now(), 
+                type: 'income', 
+                title: source, 
+                amount: amount,
+                timeStr: getFormattedTime() 
+            });
+            
+            renderLedger();
+            updateMetrics();
+            document.getElementById('earn-form').reset();
+        }
+
+        function handleSpend() {
+            const item = document.getElementById('spend-item').value;
+            const amount = parseFloat(document.getElementById('spend-amount').value);
+            const category = document.getElementById('spend-category').value;
+
+            transactions.push({ 
+                id: Date.now(), 
+                type: 'expense', 
+                title: item, 
+                amount: amount, 
+                category: category,
+                timeStr: getFormattedTime() 
+            });
+            
+            renderLedger();
+            updateMetrics();
+            document.getElementById('spend-form').reset();
+        }
+
+        function deleteTransaction(index) {
+            transactions.splice(index, 1);
+            renderLedger();
+            updateMetrics();
+        }
+
+        function resetAllData() {
+            if (confirm("Are you sure you want to delete all entries and clear your balance sheet?")) {
+                transactions = [];
+                renderLedger();
+                updateMetrics();
+            }
+        }
+
+        // Run application on start to draw baseline elements
+        renderLedger();
+        updateMetrics();
+    </script>
+
+</body>
+</html>
